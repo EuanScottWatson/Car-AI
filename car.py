@@ -43,6 +43,6 @@ class Car:
             self.angle = (self.angle + angle + 2 * math.pi)
 
     def reset(self):
-        self.x = 250
+        self.x = 300
         self.y = 125
         self.angle = 0

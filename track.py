@@ -7,7 +7,7 @@ class Game:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.car = Car(250, 125)
+        self.car = Car(300, 125)
         self.track = [[(267, 187), (992, 141), (1178, 215), (993, 251), (758, 283), (502, 349), (511, 447), (705, 510),
                        (1048, 562), (1101, 598), (1087, 657), (510, 640), (270, 592), (219, 404), (267, 187)],
                       [(51, 195), (192, 44), (1208, 54), (1335, 215), (1270, 326), (829, 371), (1269, 472), (1316, 645),
@@ -76,9 +76,9 @@ class Game:
             u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denominator
 
             if 0 < t < 1 and 1 > u > 0:
-                # x = int(x1 + t * (x2 - x1))
-                # y = int(y1 + t * (y2 - y1))
-                return True
+                x = int(x1 + t * (x2 - x1))
+                y = int(y1 + t * (y2 - y1))
+                return x, y
             else:
                 return False
 
