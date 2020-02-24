@@ -34,7 +34,15 @@ class Matrix:
         return np.multiply(self.matrix, n)
 
     def dot_matrix(self, n):
-        return self.matrix.dot(n.matrix)
+        newMatrix = Matrix(self.rows, n.cols)
+
+        if self.cols == n.rows:
+            for i in range(self.rows):
+                for j in range(n.cols):
+                    for k in range(self.cols):
+                        newMatrix.matrix[i][j] = newMatrix.matrix[i][j] + (self.matrix[i][k] * n.matrix[k][j])
+
+        return newMatrix
 
     def transpose(self):
         return self.matrix.transpose()

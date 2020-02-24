@@ -53,3 +53,7 @@ class NeuralNet:
         clone.who = self.who.clone()
 
         return clone
+
+
+nn = NeuralNet(5, 6, 3)
+nn.feed_forward(np.array([1, 2, 10, 2, 1])).output()
