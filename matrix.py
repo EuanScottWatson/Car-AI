@@ -9,6 +9,10 @@ class Matrix:
         self.cols = cols
         self.matrix = np.zeros([rows, cols])
 
+    def matrix_from_inputs(self, inputs):
+        for i in range(len(inputs)):
+            self.matrix[i][0] = inputs[i]
+
     def randomise(self):
         for i in range(self.rows):
             for j in range(self.cols):
