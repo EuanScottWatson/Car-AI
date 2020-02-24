@@ -7,9 +7,11 @@ class Game:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.car = Car(100, 100)
-        self.track = [[(221, 248), (452, 249), (509, 375), (470, 472), (285, 454), (209, 401), (221, 248)],
-                      [(156, 164), (472, 148), (595, 312), (583, 546), (293, 567), (81, 464), (156, 164)]]
+        self.car = Car(250, 125)
+        self.track = [[(267, 187), (992, 141), (1178, 215), (993, 251), (758, 283), (502, 349), (511, 447), (705, 510),
+                       (1048, 562), (1101, 598), (1087, 657), (510, 640), (270, 592), (219, 404), (267, 187)],
+                      [(51, 195), (192, 44), (1208, 54), (1335, 215), (1270, 326), (829, 371), (1269, 472), (1316, 645),
+                       (1154, 748), (307, 738), (52, 670), (51, 195)]]
 
     def display(self, screen):
         pygame.draw.lines(screen, (255, 255, 255), True, self.car.corners)
@@ -88,7 +90,7 @@ def main():
 
     os.environ['SDL_VIDEO_CENTERED'] = "True"
 
-    width, height = 650, 650
+    width, height = 1400, 800
 
     screen = pygame.display.set_mode((width, height))
 
@@ -101,7 +103,7 @@ def main():
         game.run_logic()
         game.display_screen(screen)
 
-        clock.tick(28)
+        clock.tick(60)
 
 
 if __name__ == "__main__":

@@ -32,8 +32,8 @@ class Car:
                       [self.bottom_right, self.bottom_left], [self.bottom_left, self.top_left]]
 
     def drive(self):
-        self.x += int(5 * math.cos(self.angle))
-        self.y += int(5 * math.sin(self.angle))
+        self.x += 3 * math.cos(self.angle)
+        self.y += 3 * math.sin(self.angle)
         self.update_corners()
 
     def turn(self, angle):
@@ -43,6 +43,6 @@ class Car:
             self.angle = (self.angle + angle + 2 * math.pi)
 
     def reset(self):
-        self.x = 50
-        self.y = 50
+        self.x = 250
+        self.y = 125
         self.angle = 0

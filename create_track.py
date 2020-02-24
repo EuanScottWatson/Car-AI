@@ -51,7 +51,7 @@ def main():
 
     os.environ['SDL_VIDEO_CENTERED'] = "True"
 
-    width, height = 650, 650
+    width, height = 1400, 800
 
     screen = pygame.display.set_mode((width, height))
 
@@ -63,7 +63,7 @@ def main():
         done = game.events()
         game.display_screen(screen)
 
-        clock.tick(28)
+        clock.tick(15)
 
     print([game.outer_points, game.inner_points])
 
