@@ -8,20 +8,20 @@ class Game:
         self.width = width
         self.height = height
 
-        self.population_size = 25
+        self.population_size = 12
         self.cars = [Car(300, 125) for _ in range(self.population_size)]
-        self.generation = 1
+        self.generation = 0
 
         self.track = [
             [(211, 267), (295, 190), (358, 169), (442, 171), (542, 186), (627, 220), (714, 230), (789, 204), (861, 163),
              (979, 154), (1076, 175), (1127, 217), (1128, 264), (1076, 297), (979, 308), (966, 348), (959, 409),
              (959, 486), (1012, 510), (1095, 573), (1129, 629), (1113, 658), (1001, 668), (919, 649), (881, 573),
              (864, 510), (825, 437), (746, 384), (649, 360), (600, 372), (524, 403), (483, 457), (453, 518), (420, 575),
-             (335, 605), (245, 598), (207, 523), (187, 430)],
+             (335, 605), (245, 598), (207, 523), (187, 430), (211, 267)],
             [(107, 184), (292, 45), (413, 50), (624, 116), (730, 120), (881, 57), (1077, 60), (1193, 137), (1267, 231),
              (1265, 299), (1201, 366), (1100, 399), (1085, 451), (1122, 489), (1204, 531), (1266, 578), (1273, 652),
              (1200, 737), (1005, 764), (836, 733), (759, 626), (708, 508), (640, 485), (583, 513), (556, 577),
-             (539, 672), (506, 715), (326, 735), (166, 693), (84, 519)]]
+             (539, 672), (506, 715), (326, 735), (166, 693), (84, 519), (107, 184)]]
 
         self.player = False
 
@@ -89,12 +89,12 @@ class Game:
                 return False
 
     def get_inputs(self, car):
-        inputs = np.zeros(5)
-        for i in range(-2, 3, 1):
+        inputs = np.zeros(9)
+        for i in range(-4, 5, 1):
             distances = []
             for side in self.track:
                 for j in range(len(side) - 1):
-                    angle = car.angle + (i * math.pi / 4)
+                    angle = car.angle + (i * math.pi / 8)
                     ray = [[car.x, car.y], [car.x + 1000 * math.cos(angle), car.y + 1000 * math.sin(angle)]]
                     collision = self.check_wall(ray, [side[j], side[j + 1]])
                     if collision:
@@ -122,9 +122,9 @@ class Game:
 
     def create_new_population(self):
         ranked_gen = self.rank_generation()
-        new_nns = [ranked_gen[0].nn.clone()]
+        new_nns = [ranked_gen[0].nn.clone(), ranked_gen[1].nn.clone(), ranked_gen[2].nn.clone()]
 
-        for i in range(1, self.population_size):
+        for i in range(3, self.population_size):
             if i < self.population_size / 2:
                 new_nns.append(self.select_car().nn.clone())
             else:

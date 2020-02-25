@@ -8,7 +8,7 @@ class Car:
         self.y = y
         self.angle = 0
 
-        self.nn = NeuralNet(5, 6, 3)
+        self.nn = NeuralNet(9, 12, 3)
         self.dead = False
         self.fitness = 0
 
