@@ -23,7 +23,6 @@ class NeuralNet:
     def feed_forward(self, inputs):
         inputMatrix = Matrix(len(inputs), 1)
         inputMatrix.matrix_from_inputs(inputs)
-        inputMatrix.output()
 
         hiddenInputs = self.wih.dot_matrix(inputMatrix)
         hiddenOuputs = hiddenInputs.activate()
@@ -53,7 +52,3 @@ class NeuralNet:
         clone.who = self.who.clone()
 
         return clone
-
-
-nn = NeuralNet(5, 6, 3)
-nn.feed_forward(np.array([1, 2, 10, 2, 1])).output()

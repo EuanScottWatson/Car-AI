@@ -1,4 +1,5 @@
 import math
+from neural_network import *
 
 
 class Car:
@@ -6,6 +7,10 @@ class Car:
         self.x = x
         self.y = y
         self.angle = 0
+
+        self.nn = NeuralNet(5, 6, 3)
+        self.dead = False
+        self.fitness = 0
 
         self.top_left = []
         self.top_right = []
@@ -43,6 +48,4 @@ class Car:
             self.angle = (self.angle + angle + 2 * math.pi)
 
     def reset(self):
-        self.x = 300
-        self.y = 125
-        self.angle = 0
+        self.dead = True
