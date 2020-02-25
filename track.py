@@ -52,16 +52,21 @@ class Game:
 
     def check_reset(self):
         for car in self.cars:
-            for line in car.lines:
-                for side in self.track:
-                    for i in range(len(side) - 1):
-                        collision = self.check_wall(line, [side[i], side[i + 1]])
-                        if collision:
-                            car.reset()
+            if not car.dead:
+                for line in car.lines:
+                    for side in self.track:
+                        for i in range(len(side) - 1):
+                            collision = self.check_wall(line, [side[i], side[i + 1]])
+                            if collision:
+                                car.reset()
 
-            for point in car.corners:
-                if not (0 < point[0] < self.width and 0 < point[1] < self.height):
-                    car.reset()
+                    if self.check_wall(line, [[271, 214], [276, 59]]):
+                        car.reset()
+                        car.fitness += 500
+
+                for point in car.corners:
+                    if not (0 < point[0] < self.width and 0 < point[1] < self.height):
+                        car.reset()
 
     def check_wall(self, line1, line2):
         x1 = line1[0][0]
