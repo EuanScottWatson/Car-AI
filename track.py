@@ -3,12 +3,12 @@ from pygame.locals import *
 from car import *
 
 
-class Game:
-    def __init__(self, width, height):
+class Run:
+    def __init__(self, width, height, pop_size):
         self.width = width
         self.height = height
 
-        self.population_size = 12
+        self.population_size = pop_size
         self.cars = [Car(300, 125) for _ in range(self.population_size)]
         self.generation = 0
 
@@ -26,6 +26,7 @@ class Game:
         self.player = False
 
     def display(self, screen):
+        # Display track and cars
         for car in self.cars:
             pygame.draw.lines(screen, (255, 255, 255), True, car.corners)
 
@@ -53,6 +54,7 @@ class Game:
     def check_reset(self):
         for car in self.cars:
             if not car.dead:
+                # If the car has reached a wall, the finish line or left the map then set the car to dead
                 for line in car.lines:
                     for side in self.track:
                         for i in range(len(side) - 1):
@@ -60,6 +62,7 @@ class Game:
                             if collision:
                                 car.reset()
 
+                    # Finish line = extra fitness
                     if self.check_wall(line, [[271, 214], [276, 59]]):
                         car.reset()
                         car.fitness += 500
@@ -69,6 +72,7 @@ class Game:
                         car.reset()
 
     def check_wall(self, line1, line2):
+        # Algorithm for finding coordinate of intersection of two lines
         x1 = line1[0][0]
         y1 = line1[0][1]
         x2 = line1[1][0]
@@ -94,6 +98,7 @@ class Game:
                 return False
 
     def get_inputs(self, car):
+        # Get inputs from 9 directions going from -45 degrees to + 45 degrees of however the car is currently facing
         inputs = np.zeros(9)
         for i in range(-4, 5, 1):
             distances = []
@@ -102,23 +107,30 @@ class Game:
                     angle = car.angle + (i * math.pi / 8)
                     ray = [[car.x, car.y], [car.x + 1000 * math.cos(angle), car.y + 1000 * math.sin(angle)]]
                     collision = self.check_wall(ray, [side[j], side[j + 1]])
+                    # Input is just the Euclidean distance from the wall
                     if collision:
                         distance = (collision[0] - car.x) ** 2 + (collision[1] - car.y) ** 2
                         distances.append(distance ** 0.5)
+            # Select the smallest distance, if the ray hits multiple walls. If not distance has been found then set
+            # the input to be far away, however this is very unlikely as their FOV is 1000 pixels
             if distances:
                 inputs[i + 2] = min(distances)
             else:
-                inputs[i + 2] = 50
+                inputs[i + 2] = 500
 
         return inputs
 
     def rank_generation(self):
+        # Return the generation ranked based on fitness
         return sorted(self.cars, key=lambda x: x.fitness, reverse=True)
 
     def select_car(self):
+        # Get the total sum of fitnesses
         total_sum = sum(map(lambda x: x.fitness, self.cars))
         running_sum = 0
 
+        # Select random point to pick fitness
+        # Whichever car lands within this point will be selected
         sum_cutoff = random.randrange(0, total_sum - 1)
         for car in self.cars:
             running_sum += car.fitness
@@ -126,27 +138,34 @@ class Game:
                 return car
 
     def create_new_population(self):
+        # First get the ranked generation
         ranked_gen = self.rank_generation()
+        # Carry over 3 best cars
         new_nns = [ranked_gen[0].nn.clone(), ranked_gen[1].nn.clone(), ranked_gen[2].nn.clone()]
 
+        # For rest of them, half just carry over, the other half get from breeding
         for i in range(3, self.population_size):
             if i < self.population_size / 2:
                 new_nns.append(self.select_car().nn.clone())
             else:
                 new_nns.append(self.select_car().nn.crossover(self.select_car().nn))
 
+            # Mutate each of the new cars - i.e. not first three
             new_nns[i].mutate(0.25)
 
+        # Initialise new cars and give them the set of nns created from previous generation
         new_cars = [Car(300, 125) for _ in range(self.population_size)]
         for i in range(self.population_size):
             new_cars[i].nn = new_nns[i]
 
+        # Replace all current cars and increment the generation number
         self.cars = new_cars
         self.generation += 1
 
         return ranked_gen[0]
 
     def check_population_dead(self):
+        # Check if the entire population has died yet
         for car in self.cars:
             if not car.dead:
                 return False
@@ -154,17 +173,22 @@ class Game:
 
     def run_generation(self):
         for car in self.cars:
+            # Only check for cars that aren't dead yet
             if not car.dead:
                 car.drive()
 
+                # Allows the player to drive for testing purposes
                 if self.player:
                     if pygame.key.get_pressed()[K_LEFT]:
                         car.turn(-math.pi / 48)
                     elif pygame.key.get_pressed()[K_RIGHT]:
                         car.turn(math.pi / 48)
                 else:
+                    # Otherwise get the output from the nn
                     output = car.nn.feed_forward(self.get_inputs(car))
                     choice = output.matrix.argmax()
+                    # Based on how "confident" the car is the turning angle will range slightly
+                    # If choice is 1 it means go straight therefore don't move
                     if choice == 0:
                         car.turn(output.matrix[0] * -math.pi / 48)
                     elif choice == 2:
@@ -188,17 +212,20 @@ def main():
 
     done = False
     clock = pygame.time.Clock()
-    game = Game(width, height)
+    run = Run(width, height, 12)
 
     while not done:
-        while not game.check_population_dead():
-            done = game.events()
-            game.run_generation()
-            game.display_screen(screen)
+        while not run.check_population_dead():
+            # While the generation isn't dead, run pop and update screen
+            done = run.events()
+            run.run_generation()
+            run.display_screen(screen)
 
             clock.tick(60)
-        best_car = game.create_new_population()
-        print("Generation " + str(game.generation) + " Best Fitness: " + str(best_car.fitness))
+
+        # Once dead, create the new population and output the best fitness from the generation
+        best_car = run.create_new_population()
+        print("Generation " + str(run.generation) + " Best Fitness: " + str(best_car.fitness))
 
 
 if __name__ == "__main__":

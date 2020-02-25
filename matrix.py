@@ -10,10 +10,12 @@ class Matrix:
         self.matrix = np.zeros([rows, cols])
 
     def matrix_from_inputs(self, inputs):
+        # Convert an array into an n x 1 matrix
         for i in range(len(inputs)):
             self.matrix[i][0] = inputs[i]
 
     def randomise(self):
+        # Set each value to a random value based on the normal distribution
         for i in range(self.rows):
             for j in range(self.cols):
                 self.matrix[i][j] = random.uniform(-1, 1)
@@ -21,6 +23,7 @@ class Matrix:
     def output(self):
         print(self.matrix)
 
+    # Series of functions for implementing biases
     def multiply_scalar(self, n):
         self.matrix *= n
 
@@ -34,6 +37,7 @@ class Matrix:
         return np.multiply(self.matrix, n)
 
     def dot_matrix(self, n):
+        # Create new matrix and fill its values with the dot of the two matrices
         newMatrix = Matrix(self.rows, n.cols)
 
         if self.cols == n.rows:
@@ -44,10 +48,8 @@ class Matrix:
 
         return newMatrix
 
-    def transpose(self):
-        return self.matrix.transpose()
-
     def activate(self):
+        # Create a new matrix with the values being the original values passed through the sigmoid function
         newMatrix = Matrix(self.rows, self.cols)
         for i in range(self.rows):
             for j in range(self.cols):
@@ -57,36 +59,36 @@ class Matrix:
     def sigmoid(self, x):
         return 1 / (1 + np.e ** (-1 * x))
 
-    def sigmoid_prime(self, x):
-        newMatrix = Matrix(self.rows, self.cols)
-        for i in range(self.rows):
-            for j in range(self.cols):
-                newMatrix.matrix[i][j] = self.matrix[i][j] * (1 - self.matrix[i][j])
-        return newMatrix
-
     def clone(self):
+        # Create a new copy of the matrix through deep copy
         newMatrix = Matrix(self.rows, self.cols)
         newMatrix.matrix = copy.deepcopy(self.matrix)
         return newMatrix
 
     def mutate(self, mutationRate):
+        # Loop through all the weights
         for i in range(self.rows):
             for j in range(self.cols):
+                # If the randomly generated float is below the mutation rate then alter it a bit
                 rand = random.random()
                 if rand < mutationRate:
                     self.matrix[i][j] += np.random.normal() / 5
 
+                # Make sure the weights are bounded
                 if self.matrix[i][j] > 1:
                     self.matrix[i][j] = 1
                 if self.matrix[i][j] < -1:
                     self.matrix[i][j] = -1
 
     def crossover(self, matrixB):
+        # Initialise new child
         child = Matrix(self.rows, self.cols)
 
+        # Select the point of crossover
         rowCrossOver = random.randint(0, self.rows - 1)
         colCrossOver = random.randint(0, self.cols - 1)
 
+        # Implemenent the crossover based on the cut off points
         for i in range(self.rows):
             for j in range(self.cols):
                 if (i < rowCrossOver) or (i == rowCrossOver and j <= colCrossOver):

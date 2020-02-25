@@ -3,6 +3,7 @@ from matrix import *
 
 class NeuralNet:
     def __init__(self, inputNo, hiddenNo, outputNo):
+        # Initialise the Neural Network with the input layer, two hidden nodes and an output layer
         self.inputNo = inputNo
         self.hiddenNo = hiddenNo
         self.outputNo = outputNo
@@ -16,11 +17,14 @@ class NeuralNet:
         self.who.randomise()
 
     def mutate(self, mutationRate):
+        # Mutate each set of weights
         self.wih.mutate(mutationRate)
         self.whh.mutate(mutationRate)
         self.who.mutate(mutationRate)
 
     def feed_forward(self, inputs):
+        # Pass inputs through by initialising input matrix, multiplying with weights, passing into sigmoid function and
+        # repeat until output
         inputMatrix = Matrix(len(inputs), 1)
         inputMatrix.matrix_from_inputs(inputs)
 
@@ -36,6 +40,7 @@ class NeuralNet:
         return outputs
 
     def crossover(self, nnB):
+        # Take another nn and crossover each set of weights
         child = NeuralNet(self.inputNo, self.hiddenNo, self.outputNo)
 
         child.wih = self.wih.crossover(nnB.wih)
@@ -45,6 +50,7 @@ class NeuralNet:
         return child
 
     def clone(self):
+        # Clone the entire neural network
         clone = NeuralNet(self.inputNo, self.hiddenNo, self.outputNo)
 
         clone.wih = self.wih.clone()

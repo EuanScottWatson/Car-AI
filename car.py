@@ -22,6 +22,7 @@ class Car:
         self.update_corners()
 
     def update_corners(self):
+        # Using Pythagoras to find corners based on (x, y) and angle
         self.top_left = [self.x + int(30 * math.cos((5 * math.pi / 6) + self.angle)),
                          self.y + int(30 * math.sin((5 * math.pi / 6) + self.angle))]
         self.top_right = [self.x + int(30 * math.cos((math.pi / 6) + self.angle)),
@@ -37,6 +38,7 @@ class Car:
                       [self.bottom_right, self.bottom_left], [self.bottom_left, self.top_left]]
 
     def drive(self):
+        # Move in direction of angle at rate of 3 pixels per frame
         self.x += 3 * math.cos(self.angle)
         self.y += 3 * math.sin(self.angle)
         self.update_corners()
@@ -48,4 +50,5 @@ class Car:
             self.angle = (self.angle + angle + 2 * math.pi)
 
     def reset(self):
+        # Set car to dead
         self.dead = True

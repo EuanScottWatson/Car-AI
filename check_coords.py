@@ -3,6 +3,7 @@ from pygame.locals import *
 
 
 class Game:
+    # Code to take in a track then allow the user to check coordinates by clicking
     def __init__(self):
         self.inner = False
         self.inner_points = [(211, 267), (295, 190), (358, 169), (442, 171), (542, 186), (627, 220), (714, 230), (789, 204), (861, 163),
