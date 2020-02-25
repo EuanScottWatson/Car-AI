@@ -10,6 +10,7 @@ class Game:
 
         self.population_size = 25
         self.cars = [Car(300, 125) for _ in range(self.population_size)]
+        self.generation = 1
 
         self.track = [
             [(211, 267), (295, 190), (358, 169), (442, 171), (542, 186), (627, 220), (714, 230), (789, 204), (861, 163),
@@ -121,33 +122,29 @@ class Game:
 
     def create_new_population(self):
         ranked_gen = self.rank_generation()
-        new_nns = []
-        best_nn = ranked_gen[0].nn
-        best_fitness = ranked_gen[0].fitness
-
-        new_nns.append(best_nn)
+        new_nns = [ranked_gen[0].nn.clone()]
 
         for i in range(1, self.population_size):
             if i < self.population_size / 2:
-                new_nns.append(self.select_car().nn)
+                new_nns.append(self.select_car().nn.clone())
             else:
                 new_nns.append(self.select_car().nn.crossover(self.select_car().nn))
 
             new_nns[i].mutate(0.25)
 
-        new_cars = [Car(300, 150) for _ in range(self.population_size)]
+        new_cars = [Car(300, 125) for _ in range(self.population_size)]
         for i in range(self.population_size):
             new_cars[i].nn = new_nns[i]
 
         self.cars = new_cars
+        self.generation += 1
 
-        return best_fitness
+        return ranked_gen[0]
 
     def check_population_dead(self):
         for car in self.cars:
             if not car.dead:
                 return False
-
         return True
 
     def run_generation(self):
@@ -187,7 +184,6 @@ def main():
     done = False
     clock = pygame.time.Clock()
     game = Game(width, height)
-    gen = 1
 
     while not done:
         while not game.check_population_dead():
@@ -196,9 +192,8 @@ def main():
             game.display_screen(screen)
 
             clock.tick(60)
-        best_fitness = game.create_new_population()
-        print("Generation " + str(gen) + " Best Fitness: " + str(best_fitness))
-        gen += 1
+        best_car = game.create_new_population()
+        print("Generation " + str(game.generation) + " Best Fitness: " + str(best_car.fitness))
 
 
 if __name__ == "__main__":
