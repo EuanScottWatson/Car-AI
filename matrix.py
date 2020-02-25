@@ -65,7 +65,9 @@ class Matrix:
         return newMatrix
 
     def clone(self):
-        return copy.deepcopy(self.matrix)
+        newMatrix = Matrix(self.rows, self.cols)
+        newMatrix.matrix = copy.deepcopy(self.matrix)
+        return newMatrix
 
     def mutate(self, mutationRate):
         for i in range(self.rows):

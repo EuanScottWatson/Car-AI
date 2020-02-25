@@ -8,12 +8,19 @@ class Game:
         self.width = width
         self.height = height
 
-        self.population_size = 10
+        self.population_size = 25
         self.cars = [Car(300, 125) for _ in range(self.population_size)]
-        self.track = [[(267, 187), (992, 141), (1178, 215), (993, 251), (758, 283), (502, 349), (511, 447), (705, 510),
-                       (1048, 562), (1101, 598), (1087, 657), (510, 640), (270, 592), (219, 404), (267, 187)],
-                      [(51, 195), (192, 44), (1208, 54), (1335, 215), (1270, 326), (829, 371), (1269, 472), (1316, 645),
-                       (1154, 748), (307, 738), (52, 670), (51, 195)]]
+
+        self.track = [
+            [(211, 267), (295, 190), (358, 169), (442, 171), (542, 186), (627, 220), (714, 230), (789, 204), (861, 163),
+             (979, 154), (1076, 175), (1127, 217), (1128, 264), (1076, 297), (979, 308), (966, 348), (959, 409),
+             (959, 486), (1012, 510), (1095, 573), (1129, 629), (1113, 658), (1001, 668), (919, 649), (881, 573),
+             (864, 510), (825, 437), (746, 384), (649, 360), (600, 372), (524, 403), (483, 457), (453, 518), (420, 575),
+             (335, 605), (245, 598), (207, 523), (187, 430)],
+            [(107, 184), (292, 45), (413, 50), (624, 116), (730, 120), (881, 57), (1077, 60), (1193, 137), (1267, 231),
+             (1265, 299), (1201, 366), (1100, 399), (1085, 451), (1122, 489), (1204, 531), (1266, 578), (1273, 652),
+             (1200, 737), (1005, 764), (836, 733), (759, 626), (708, 508), (640, 485), (583, 513), (556, 577),
+             (539, 672), (506, 715), (326, 735), (166, 693), (84, 519)]]
 
         self.player = False
 
@@ -99,24 +106,42 @@ class Game:
 
         return inputs
 
-    def run(self):
-        self.run_generation()
-
     def rank_generation(self):
-        return sorted(self.cars, key=lambda x: x.fitness)
+        return sorted(self.cars, key=lambda x: x.fitness, reverse=True)
 
-    def select_car(self, ranked_cars):
-        total_sum = sum(map(lambda x: x.fitness, ranked_cars))
+    def select_car(self):
+        total_sum = sum(map(lambda x: x.fitness, self.cars))
+        running_sum = 0
 
-        sum_cutoff = random.randrange(0, total_sum)
+        sum_cutoff = random.randrange(0, total_sum - 1)
+        for car in self.cars:
+            running_sum += car.fitness
+            if running_sum > sum_cutoff:
+                return car
 
     def create_new_population(self):
         ranked_gen = self.rank_generation()
-        new_cars = []
-        best_player = ranked_gen[0].nn.clone()
+        new_nns = []
+        best_nn = ranked_gen[0].nn
+        best_fitness = ranked_gen[0].fitness
 
-        new_cars.append(best_player)
+        new_nns.append(best_nn)
 
+        for i in range(1, self.population_size):
+            if i < self.population_size / 2:
+                new_nns.append(self.select_car().nn)
+            else:
+                new_nns.append(self.select_car().nn.crossover(self.select_car().nn))
+
+            new_nns[i].mutate(0.25)
+
+        new_cars = [Car(300, 150) for _ in range(self.population_size)]
+        for i in range(self.population_size):
+            new_cars[i].nn = new_nns[i]
+
+        self.cars = new_cars
+
+        return best_fitness
 
     def check_population_dead(self):
         for car in self.cars:
@@ -162,15 +187,18 @@ def main():
     done = False
     clock = pygame.time.Clock()
     game = Game(width, height)
+    gen = 1
 
     while not done:
-        if not game.check_population_dead():
+        while not game.check_population_dead():
             done = game.events()
-            game.run()
+            game.run_generation()
             game.display_screen(screen)
 
             clock.tick(60)
-        game.create_new_population()
+        best_fitness = game.create_new_population()
+        print("Generation " + str(gen) + " Best Fitness: " + str(best_fitness))
+        gen += 1
 
 
 if __name__ == "__main__":
